@@ -31,6 +31,7 @@ marker.bindPopup("<strong>Hello world!</strong><br />I am a popup.").openPopup()
 circle.bindPopup("I am a circle.");
 polygon.bindPopup("I am a polygon.");
 
+// standalone popup on execution
 var popup = L.popup()
     .setLatLng([51.5, -0.09])
     .setContent("I am a standalone popup.")
