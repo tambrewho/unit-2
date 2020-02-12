@@ -1,5 +1,7 @@
+//Leaflet GeoJSON Tutorial
 var map = L.map('mapid').setView([39.74739,-105], 13);
 
+// add mapbox tilelayer to map
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
@@ -7,6 +9,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     accessToken: 'pk.eyJ1IjoidGFtYnJld2hvIiwiYSI6ImNrNmp3ZDA2ZjAwbDAza28wemc2b3VlcW4ifQ.vEl-InkeyTW44vClE1RDFA'
 }).addTo(map);
 
+// GeoJSON map feature
 var geojsonFeature = {
     "type": "Feature",
     "properties": {
@@ -20,11 +23,14 @@ var geojsonFeature = {
     }
 };
 
+// add previously created feature to map
 L.geoJSON(geojsonFeature).addTo(map);
 
+// creates an empty GeoJSON layer and adds it to map
 var myLayer = L.geoJSON().addTo(map);
 myLayer.addData(geojsonFeature);
 
+// adds lines with specified coordinates to the map layer
 var myLines = [{
     "type": "LineString",
     "coordinates": [[-100, 40], [-105, 45], [-110, 55]]
@@ -33,12 +39,14 @@ var myLines = [{
     "coordinates": [[-105, 40], [-110, 45], [-115, 55]]
 }];
 
+// gives map layer color
 var myStyle = {
     "color": "#ff7800",
     "weight": 5,
     "opacity": 0.65
 };
 
+// adds above GeoJSON features to previously created empty map
 L.geoJSON(myLines, {
     style: myStyle
 }).addTo(map);
@@ -71,6 +79,7 @@ var states = [{
     }
 }];
 
+// checks the party property and styles the shapes accordingly on the map
 L.geoJSON(states, {
     style: function(feature) {
         switch (feature.properties.party) {
@@ -80,6 +89,7 @@ L.geoJSON(states, {
     }
 }).addTo(map);
 
+// styes for circle marker
 var geojsonMarkerOptions = {
     radius: 8,
     fillColor: "#ff7800",
@@ -89,6 +99,7 @@ var geojsonMarkerOptions = {
     fillOpacity: 0.8
 };
 
+// uses pointToLayer function to add a circle marker
 L.geoJSON(geojsonFeature, {
     pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions);
@@ -117,6 +128,7 @@ var someFeatures = [{
     }
 }];
 
+// uses filter method to control the visibility of some features
 L.geoJSON(someFeatures, {
     filter: function(feature, layer) {
         return feature.properties.show_on_map;
