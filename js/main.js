@@ -10,10 +10,11 @@ function createMap(){
         zoom: 2
     });
 
-    // TODO: BROWSE FOR NEW TILESET
-    // add OSM base tilelayer
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    // DONE: BROWSE FOR NEW TILESET
+    // added new OSM base tilelayer
+    L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    	maxZoom: 17,
+    	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
     }).addTo(mainmap);
 
     //call getData function
@@ -24,7 +25,7 @@ function createMap(){
 //function to retrieve the data and place it on the map
 function getData(){
     //load the data
-    $.getJSON("data/MegaCities.geojson", function(response){
+    $.getJSON("data/ActivityData.geojson", function(response){
             //create marker options
             var geojsonMarkerOptions = {
                 radius: 8,
