@@ -21,7 +21,7 @@ function createMap(){
     getData();
 };
 
-// TODO: FIND NEW DATA
+// DONE: FIND NEW DATA
 //function to retrieve the data and place it on the map
 function getData(){
     //load the data
