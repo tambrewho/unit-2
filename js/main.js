@@ -40,8 +40,16 @@ function processData(data){
 
 //Step 1: Create new sequence controls
 function createSequenceControls(attributes){
-    //create range input element (slider)
+    //create range input element (slider) and add to panel
     $('#panel').append('<input class="range-slider" type="range">');
+
+    //create step buttons and add to panel
+    $('#panel').append('<button class="step" id="reverse">Reverse</button>');
+    $('#panel').append('<button class="step" id="forward">Forward</button>');
+
+    //replace button content with images
+    $('#reverse').html('<img src="img/left.png">');
+    $('#forward').html('<img src="img/right.png">');
 
     //set slider attributes
     $('.range-slider').attr({
@@ -82,9 +90,6 @@ function createSequenceControls(attributes){
         //Step 9: pass new attribute to update symbols
         updatePropSymbols(attributes[index]);
     });
-
-    $('#panel').append('<button class="step" id="reverse">Reverse</button>');
-    $('#panel').append('<button class="step" id="forward">Forward</button>');
 };
 
 
