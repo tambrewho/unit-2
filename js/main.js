@@ -40,12 +40,32 @@ function processData(data){
 
 //Step 1: Create new sequence controls
 function createSequenceControls(attributes){
-    //create range input element (slider) and add to panel
-    $('#panel').append('<input class="range-slider" type="range">');
+    var SequenceControl = L.Control.extend({
+        options: {
+            position: 'bottomleft'
+        },
 
-    //create step buttons and add to panel
-    $('#panel').append('<button class="step" id="reverse">Reverse</button>');
-    $('#panel').append('<button class="step" id="forward">Forward</button>');
+        onAdd: function () {
+            // create the control container div with a particular class name
+            var container = L.DomUtil.create('div', 'sequence-control-container');
+
+            //create range input element (slider)
+            $(container).append('<input class="range-slider" type="range">');
+
+            //add skip buttons
+            $(container).append('<button class="step" id="reverse" title="Reverse">Reverse</button>');
+            $(container).append('<button class="step" id="forward" title="Forward">Forward</button>');
+
+            // disables any mouse event listeners for the container
+            L.DomEvent.disableClickPropagation(container);
+
+            return container;
+        }
+    });
+
+    mainmap.addControl(new SequenceControl());
+
+    // add listeners after adding control
 
     //replace button content with images
     $('#reverse').html('<img src="img/left.png">');
@@ -145,7 +165,7 @@ function pointToLayer(feature, coordinates, attributes){
 
 //Step 10: Resize proportional symbols according to new attribute values
 function updatePropSymbols(attribute){
-  
+
     mainmap.eachLayer(function(layer){
       if (layer.feature && layer.feature.properties[attribute]){
           //access feature properties
@@ -171,7 +191,7 @@ function createPopupContent(properties, attribute) {
   var popupContent = "<p><b>City:</b> " + properties.CountryName + "</p>"
                               + "<p><b>Year:</b> " + attribute + "</p>";
   //add formatted attribute to popup content string
-  popupContent += "<p><b>Rural population growth (annual %):</b> " + properties[attribute] + "</p>";
+  popupContent += "<p><b>Rural population growth (annual %):</b> " + properties[attribute].toFixed(2) + "</p>";
 
   return popupContent;
 
