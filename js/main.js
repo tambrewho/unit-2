@@ -112,8 +112,6 @@ function getData(mainmap){
 function pointToLayer(feature, coordinates, attributes){
     //Determine which attribute to visualize with proportional symbols
     var attribute = attributes[0];
-    //check
-    console.log(attribute);
 
     //create marker options
     var options = {
@@ -134,10 +132,7 @@ function pointToLayer(feature, coordinates, attributes){
     var layer = L.circleMarker(coordinates, options);
 
     //build popup content string
-    var popupContent = "<p><b>City:</b> " + feature.properties.CountryName + "</p>"
-                                + "<p><b>Year:</b> " + attribute + "</p>";
-    //add formatted attribute to popup content string
-    popupContent += "<p><b>Rural population growth (annual %):</b> " + feature.properties[attribute] + "</p>";
+    var popupContent = createPopupContent(feature.properties, attribute);
 
     //bind the popup to the circle marker with an offset
     layer.bindPopup(popupContent, {
@@ -148,20 +143,9 @@ function pointToLayer(feature, coordinates, attributes){
     return layer;
 };
 
-
-
-//Step 3: Add circle markers for point features to the map
-function createPropSymbols(data, attributes){
-  //create a Leaflet GeoJSON layer and add it to the map
-  L.geoJson(data, {
-      pointToLayer: function(feature, coordinates){
-        return pointToLayer(feature, coordinates, attributes);
-      }
-  }).addTo(mainmap);
-};
-
 //Step 10: Resize proportional symbols according to new attribute values
 function updatePropSymbols(attribute){
+  
     mainmap.eachLayer(function(layer){
       if (layer.feature && layer.feature.properties[attribute]){
           //access feature properties
@@ -172,17 +156,35 @@ function updatePropSymbols(attribute){
           layer.setRadius(radius);
 
           //build popup content string
-          var popupContent = "<p><b>City:</b> " + props.CountryName + "</p>"
-                                      + "<p><b>Year:</b> " + attribute + "</p>";
+          var popupContent = createPopupContent(props, attribute);
 
-          //add formatted attribute to popup content string
-          popupContent += "<p><b>Rural population growth (annual %):</b> " + props[attribute] + "</p>";
-
-          //update popup content
+          //update live popup content
           popup = layer.getPopup();
           popup.setContent(popupContent).update();
       };
     });
+};
+
+// function for creating attribute-based popup content
+function createPopupContent(properties, attribute) {
+  //build popup content string
+  var popupContent = "<p><b>City:</b> " + properties.CountryName + "</p>"
+                              + "<p><b>Year:</b> " + attribute + "</p>";
+  //add formatted attribute to popup content string
+  popupContent += "<p><b>Rural population growth (annual %):</b> " + properties[attribute] + "</p>";
+
+  return popupContent;
+
+}
+
+//Step 3: Add circle markers for point features to the map
+function createPropSymbols(data, attributes){
+  //create a Leaflet GeoJSON layer and add it to the map
+  L.geoJson(data, {
+      pointToLayer: function(feature, coordinates){
+        return pointToLayer(feature, coordinates, attributes);
+      }
+  }).addTo(mainmap);
 };
 
 function calcMinValue(data){
