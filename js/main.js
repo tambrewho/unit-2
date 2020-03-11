@@ -118,7 +118,7 @@ function getData(mainmap){
   //load the data
   $.getJSON("data/ActivityData.geojson", function(response){
        //calculate minimum data value
-       minValue = calcMinValue(response);
+       minValue = Math.abs(calcMinValue(response));
 
        //create an attributes array
        var attributes = processData(response);
@@ -142,6 +142,14 @@ function pointToLayer(feature, coordinates, attributes){
         fillOpacity: 0.8
     };
 
+    var NegOptions = {
+        fillColor: "#008080",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+    };
+
     //For each feature, determine its value for the selected attribute
     var attValue = Number(feature.properties[attribute]);
 
@@ -149,7 +157,12 @@ function pointToLayer(feature, coordinates, attributes){
     options.radius = calcPropRadius(attValue);
 
     //create circle marker layer
-    var layer = L.circleMarker(coordinates, options);
+    if(feature.properties[attribute] < 0) {
+      // if attribute value is negative, make circle fill value a different color
+      var layer = L.circleMarker(coordinates, NegOptions);
+    } else { // for positive attribute values
+      var layer = L.circleMarker(coordinates, options);
+    }
 
     //build popup content string
     var popupContent = createPopupContent(feature.properties, attribute);
@@ -173,7 +186,7 @@ function updatePropSymbols(attribute){
 
           //update each feature's radius based on new attribute values
           var radius = calcPropRadius(props[attribute]);
-          layer.setRadius(radius);
+          layer.setRadius(radius); //TODO: setStyle
 
           //build popup content string
           var popupContent = createPopupContent(props, attribute);
