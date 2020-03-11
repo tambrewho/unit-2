@@ -142,6 +142,7 @@ function pointToLayer(feature, coordinates, attributes){
         fillOpacity: 0.8
     };
 
+    // maker options for negative attribute values
     var NegOptions = {
         fillColor: "#008080",
         color: "#000",
@@ -186,10 +187,13 @@ function updatePropSymbols(attribute){
 
           //update each feature's radius based on new attribute values
           var radius = calcPropRadius(props[attribute]);
-          layer.setRadius(radius); //TODO: setStyle
+          layer.setRadius(radius);
 
           //build popup content string
           var popupContent = createPopupContent(props, attribute);
+
+          // legend
+          createLegend(mainmap, attribute);
 
           //update live popup content
           popup = layer.getPopup();
@@ -249,5 +253,41 @@ function calcPropRadius(attValue) {
 
      return radius;
 };
+
+//legend controls
+function createLegend(map, attributes){
+    var LegendControl = L.Control.extend({
+        options: {
+            position: 'bottomright'
+        },
+
+        onAdd: function (map) {
+            // create the control container with a particular class name
+            var container = L.DomUtil.create('div', 'legend-control-container');
+
+            //add temporal legend div to container
+            $(container).append('<div id="temporal-legend">')
+
+            //Step 1: start attribute legend svg string
+            var svg = '<svg id="attribute-legend" width="130px" height="130px">';
+
+            //add attribute legend svg to container
+            $(container).append(svg);
+
+            return container;
+        }
+    });
+
+    map.addControl(new LegendControl());
+
+    updateLegend(map, attributes[0]);
+};
+
+
+
+
+
+
+
 
 $(document).ready(createMap);
