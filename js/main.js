@@ -2,6 +2,7 @@
 //declare map var in global scope
 var mainmap;
 var dataStats = {};
+
 //function to instantiate the Leaflet map
 function createMap(){
     //create the map
@@ -19,6 +20,7 @@ function createMap(){
     getData(mainmap);
 };
 
+// function to process the  data
 function processData(data){
     //empty array to hold attributes
     var attributes = [];
@@ -38,7 +40,8 @@ function processData(data){
     return attributes;
 };
 
-//Step 1: Create new sequence controls
+
+//Step 1: function for creating new sequence controls
 function createSequenceControls(attributes){
   updatePropSymbols(attributes[0]);
     var SequenceControl = L.Control.extend({
@@ -64,6 +67,7 @@ function createSequenceControls(attributes){
         }
     });
 
+    // add sequence control to map
     mainmap.addControl(new SequenceControl());
 
     // add listeners after adding control
@@ -116,7 +120,7 @@ function createSequenceControls(attributes){
 };
 
 
-//Step 2: Import GeoJSON data
+//Step 2: function for importing GeoJSON data
 function getData(mainmap){
   //load the data
   $.getJSON("data/ActivityData.geojson", function(response){
@@ -125,10 +129,10 @@ function getData(mainmap){
        calcStats(response);
        //create an attributes array
        var attributes = processData(response);
-       //call function to create proportional symbols
-       createPropSymbols(response, attributes);
-       createSequenceControls(attributes);
-       createLegend(mainmap, attributes);
+
+       createPropSymbols(response, attributes); //call function to create proportional symbols
+       createSequenceControls(attributes); // call function to create sequence controls
+       createLegend(mainmap, attributes); // call function to create legend
   });
 };
 
@@ -137,7 +141,7 @@ function pointToLayer(feature, coordinates, attributes){
     //Determine which attribute to visualize with proportional symbols
     var attribute = attributes[0];
 
-    //create marker options
+    //create marker options (for positive attributes)
     var options = {
         fillColor: "#ff7800",
         color: "#000",
@@ -196,9 +200,6 @@ function updatePropSymbols(attribute) {
           //build popup content string
           var popupContent = createPopupContent(props, attribute);
 
-          // legend
-          // createLegend(mainmap, attribute);
-
           //update live popup content
           popup = layer.getPopup();
           popup.setContent(popupContent).update();
@@ -225,50 +226,56 @@ function createPropSymbols(data, attributes){
       pointToLayer: function(feature, coordinates){
         return pointToLayer(feature, coordinates, attributes);
       }
+
   }).addTo(mainmap);
+
 };
 
+// function for calculating legend values
 function calcStats(data){
-    //create empty array to store all data values
-    var allValues = [];
+  //create empty array to store all data values
+  var allValues = [];
 
-    //loop through each city
-    for(var city of data.features){
+  //loop through each city
+  for(var city of data.features){
 
-        //loop through each year
-        for(var year = 2008; year <= 2018; year+=1){
+      //loop through each year
+      for(var year = 2008; year <= 2018; year+=1){
 
-            //get population for current year
-            var value = city.properties[String(year)];
-            console.log("val: " + value + " yr: " + year);
-            //add value to array
-            allValues.push(value);
-        }
-    }
+          //get population for current year
+          var value = city.properties[String(year)];
+          console.log("val: " + value + " yr: " + year);
+          //add value to array
+          allValues.push(value);
+      }
+  }
 
-    //get min, max, mean stats for our array
-    dataStats.min = Math.min(...allValues);
-    dataStats.max = Math.max(...allValues);
+  //get overall min and max stats for our array
+  dataStats.min = Math.min(...allValues);
+  dataStats.max = Math.max(...allValues);
 
-    //calculate mean
-    var sum = allValues.reduce(function(a, b){return a+b;});
-    dataStats.mean = sum/ allValues.length;
+  //calculate mean
+  var sum = allValues.reduce(function(a, b){return a+b;});
+  dataStats.mean = sum/ allValues.length;
 
 }
 
-//calculate the radius of each proportional symbol
+//function for calculate the radius of each proportional symbol
 function calcPropRadius(attValue) {
      //constant factor adjusts symbol sizes evenly
      var minRadius = 20;
+
      //Flannery Appearance Compensation formula
      var radius = 1.0083 * Math.pow(attValue/Math.abs(dataStats.min),0.5715) * minRadius
 
      return radius;
 };
 
-
+// function for creating legend
 function createLegend(map, attributes){
+  // default legend
   updateLegend(attributes[0]);
+
     var LegendControl = L.Control.extend({
         options: {
             position: 'bottomright'
@@ -308,7 +315,7 @@ function createLegend(map, attributes){
                                                   '"cy="' + cy + '" fill="#ff7800" fill-opacity="0.8" stroke="#000000" cx="30"/>';
                 }
 
-                //evenly space out labels
+            //evenly space out labels
             var textY = i * 20 + 19;
 
             //text string
@@ -325,13 +332,13 @@ function createLegend(map, attributes){
             return container;
         }
     });
-
+    // add legend to map
     map.addControl(new LegendControl());
 };
 
+// function for updating year in legend based on sequence
 function updateLegend(attribute){
 //Target year element with jQuery and update with attribute
-
     $("span#year").text(attribute);
 }
 
